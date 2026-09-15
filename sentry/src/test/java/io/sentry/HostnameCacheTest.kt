@@ -16,7 +16,7 @@ class HostnameCacheTest {
   private fun getSut(): HostnameCache {
     val address = mock<InetAddress>()
     whenever(address.canonicalHostName).thenReturn("myhost")
-    return HostnameCache(TimeUnit.HOURS.toMillis(1)) { address }
+    return HostnameCache({ address }, TestMonotonicTicker())
   }
 
   @Test
@@ -30,7 +30,7 @@ class HostnameCacheTest {
     val ticker = TestMonotonicTicker()
     val address = mock<InetAddress>()
     whenever(address.canonicalHostName).thenReturn("first", "second")
-    val cache = HostnameCache(TimeUnit.HOURS.toMillis(5), { address }, ticker)
+    val cache = HostnameCache({ address }, ticker)
 
     assertThat(cache.hostname).isEqualTo("first")
 
@@ -46,11 +46,11 @@ class HostnameCacheTest {
     val ticker = TestMonotonicTicker()
     val address = mock<InetAddress>()
     whenever(address.canonicalHostName).thenReturn("myhost")
-    val cache = HostnameCache(TimeUnit.HOURS.toMillis(1), { address }, ticker)
+    val cache = HostnameCache({ address }, ticker)
     // Reject the next submit the way an executor that could not start a thread would, and let the
     // cache go stale so that reading the hostname attempts a refresh.
     cache.getProperty<ThreadPoolExecutor>("executorService").shutdown()
-    ticker.advance(1, TimeUnit.HOURS)
+    ticker.advance(5, TimeUnit.HOURS)
 
     assertThat(cache.hostname).isEqualTo("myhost")
 
