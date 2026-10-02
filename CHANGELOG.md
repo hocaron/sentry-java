@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Fixes
+
+- Keep Navigation 3 transaction and navigation data ownership aligned across lifecycle handoffs ([#6229](https://github.com/getsentry/sentry-java/pull/6229))
+
 ## 8.60.0
 
 ### Features
